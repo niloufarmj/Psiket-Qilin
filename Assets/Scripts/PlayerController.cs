@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     public GameObjectStruct[] hGates;
     public GameObjectStruct[] xGates;
     public GameObjectStruct[] cxGates;
+    public GameObjectStruct[] xcGates;
 
     public GameObject[] lasers;
 
@@ -45,6 +46,7 @@ public class PlayerController : MonoBehaviour
     {
         xGates[currentRow].cols[currentCol].SetActive(false);
         cxGates[currentRow].cols[currentCol].SetActive(false);
+        xcGates[currentRow].cols[currentCol].SetActive(false);
         hGates[currentRow].cols[currentCol].SetActive(!hGates[currentRow].cols[currentCol].activeSelf);
     }
 
@@ -52,6 +54,7 @@ public class PlayerController : MonoBehaviour
     {
         hGates[currentRow].cols[currentCol].SetActive(false);
         cxGates[currentRow].cols[currentCol].SetActive(false);
+        xcGates[currentRow].cols[currentCol].SetActive(false);
         xGates[currentRow].cols[currentCol].SetActive(!xGates[currentRow].cols[currentCol].activeSelf);
     }
 
@@ -59,7 +62,16 @@ public class PlayerController : MonoBehaviour
     {
         hGates[currentRow].cols[currentCol].SetActive(false);
         xGates[currentRow].cols[currentCol].SetActive(false);
+        xcGates[currentRow].cols[currentCol].SetActive(false);
         cxGates[currentRow].cols[currentCol].SetActive(!cxGates[currentRow].cols[currentCol].activeSelf);
+    }
+
+    public void EnableXCGate()
+    {
+        hGates[currentRow].cols[currentCol].SetActive(false);
+        xGates[currentRow].cols[currentCol].SetActive(false);
+        cxGates[currentRow].cols[currentCol].SetActive(false);
+        xcGates[currentRow].cols[currentCol].SetActive(!xcGates[currentRow].cols[currentCol].activeSelf);
     }
 
     public void MoveRight()
@@ -124,6 +136,10 @@ public class PlayerController : MonoBehaviour
                 {
                     entries[i, j] = GateType.CX;
                 }
+                else if (xcGates[i].cols[j].activeSelf)
+                {
+                    entries[i, j] = GateType.XC;
+                }
                 else
                 {
                     entries[i, j] = GateType.Empty;
@@ -180,6 +196,16 @@ public class PlayerController : MonoBehaviour
                         if (statePool[k][j] == 1)
                         {
                             statePool[k][(j + 1) % bitsCount] = statePool[k][(j + 1) % bitsCount] == 0 ? 1 : 0;
+                        }
+                    }
+                }
+                else if (entries[j, i] == GateType.XC)
+                {
+                    for (int k = 0; k < statePool.Count; k++)
+                    {
+                        if (statePool[k][j] == 1)
+                        {
+                            statePool[k][(j - 1 + bitsCount) % bitsCount] = statePool[k][(j - 1 + bitsCount) % bitsCount] == 0 ? 1 : 0;
                         }
                     }
                 }
@@ -242,22 +268,22 @@ public class PlayerController : MonoBehaviour
    
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+        if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             MoveDown();
         }
 
-        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             MoveUp();
         }
 
-        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+        if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             MoveRight();
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             MoveLeft();
         }
@@ -272,9 +298,14 @@ public class PlayerController : MonoBehaviour
             EnableHGate();
         }
 
-        if (Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.Keypad3))
+        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.Keypad3))
         {
             EnableCXGate();
+        }
+
+        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.Keypad4))
+        {
+            EnableXCGate();
         }
 
         if (Input.GetKeyDown(KeyCode.Return))
