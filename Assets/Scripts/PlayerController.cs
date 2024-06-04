@@ -11,9 +11,13 @@ public class PlayerController : MonoBehaviour
     public GameObjectStruct[] cxGates;
     public GameObjectStruct[] xcGates;
 
+    public float shooterMoveSpeed = 7.5f;
+
     public GameObject[] lasers;
 
     public GateType[,] entries;
+
+    public GameObject[] shooters;
 
     List<int[]> statePool = new List<int[]>();
 
@@ -100,10 +104,36 @@ public class PlayerController : MonoBehaviour
         currentRow = (currentRow + 1) % selections.Length;
     }
 
-    public void EnableLaser(int index)
+    public void EnableLaser(int index, int shooter)
     {
-        lasers[index].SetActive(true);
-        lasers[index].GetComponent<Rigidbody2D>().velocity = new Vector2(0, 10);
+        // Store the target position for the shooter
+        Vector2 targetPosition = new Vector2(lasers[index].transform.position.x, shooters[shooter].transform.position.y);
+
+        // Start moving the shooter towards the target position
+        StartCoroutine(MoveShooterToTarget(shooter, targetPosition, index));
+    }
+
+    private IEnumerator MoveShooterToTarget(int shooter, Vector2 targetPosition, int laserIndex)
+    {
+        Vector2 startPosition = shooters[shooter].transform.position;
+        float elapsedTime = 0f;
+        float journeyLength = Vector2.Distance(startPosition, targetPosition);
+
+        while (elapsedTime < journeyLength / shooterMoveSpeed)
+        {
+            // Use Lerp to smoothly move the shooter towards the target position
+            shooters[shooter].transform.position = Vector2.Lerp(startPosition, targetPosition, elapsedTime / (journeyLength / shooterMoveSpeed));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure the shooter reaches the final target position
+        shooters[shooter].transform.position = targetPosition;
+
+        // Set the laser speed now that the shooter has reached the target position
+        lasers[laserIndex].SetActive(true);
+        lasers[laserIndex].GetComponent<LaserController>().SetNewSprite(shooter);
+        lasers[laserIndex].GetComponent<LaserController>().speed = 10;
     }
 
     public void InitEntryArray()
@@ -229,12 +259,29 @@ public class PlayerController : MonoBehaviour
     {
         for (int i = 0; i < lasers.Length; i++)
         {
-            lasers[i].transform.position = new Vector2(lasers[i].transform.position.x, 2.1f);
-            lasers[i].GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+            lasers[i].transform.position = new Vector2(lasers[i].transform.position.x, -1.2f);
+            lasers[i].GetComponent<LaserController>().speed = 0;
             lasers[i].SetActive(false);
         }
     }
     
+    public void ResetGates()
+    {
+        for (int i = 0; i < hGates.Length; i++)
+        {
+            for (int j = 0; j < hGates[i].cols.Length; j++)
+            {
+                xGates[i].cols[j].SetActive(false);
+                hGates[i].cols[j].SetActive(false);
+                cxGates[i].cols[j].SetActive(false);
+                xcGates[i].cols[j].SetActive(false);
+            }
+        }
+
+        currentRow = 0;
+        currentCol = 0;
+    }
+
     public void Fire()
     {
         ResetLasers();
@@ -243,12 +290,17 @@ public class PlayerController : MonoBehaviour
 
         if (statePool.Count > 0)
         {
-            
+            List<int> totalStates = new List<int>();
+
+
+            for (int i = 0; i < totalStates.Count; i++)
+                totalStates[i] = -1;
+
             if (statePool.Count <= 2)
             {
                 for (int i = 0; i < statePool.Count; i++)
                 {
-                    EnableLaser(CalculateIndex(statePool[i]));
+                    totalStates.Add(CalculateIndex(statePool[i]));
                 }
             }
             else
@@ -256,13 +308,54 @@ public class PlayerController : MonoBehaviour
                 int randCount = Random.Range(1, 4);
                 for (int i = 0; i < randCount; i++)
                 {
-                    int randState = Random.Range(0, statePool.Count);
-                    EnableLaser(CalculateIndex(statePool[randState]));
+                    totalStates.Add(CalculateIndex(statePool[Random.Range(0, statePool.Count)]));
                 }
             }
 
+            totalStates = totalStates.OrderBy(num => num).ToList();
+
+            if (totalStates.Count == 1)
+            {
+                if (totalStates[0] < 3)
+                {
+                    EnableLaser(totalStates[0], 0);
+                }
+                else if (totalStates[0] < 6)
+                {
+                    EnableLaser(totalStates[0], 1);
+                }
+                else
+                {
+                    EnableLaser(totalStates[0], 2);
+                }
+            }
+            else if (totalStates.Count == 2)
+            {
+                if (totalStates[0] > 2)
+                {
+                    EnableLaser(totalStates[0], 1);
+                    EnableLaser(totalStates[1], 2);
+                }
+                else if (totalStates[1] < 6)
+                {
+                    EnableLaser(totalStates[0], 0);
+                    EnableLaser(totalStates[1], 1);
+                }
+                else
+                {
+                    EnableLaser(totalStates[0], 0);
+                    EnableLaser(totalStates[1], 2);
+                }
+            }
+            else
+            {
+                EnableLaser(totalStates[0], 0);
+                EnableLaser(totalStates[1], 1);
+                EnableLaser(totalStates[2], 2);
+            }
         }
 
+        ResetGates();
     }
 
    

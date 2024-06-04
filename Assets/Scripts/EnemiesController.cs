@@ -22,7 +22,7 @@ public class EnemiesController : MonoBehaviour
         {
             SpawnEnemy();
             currentTime = 0;
-            interval *= 0.99f;
+            interval *= 0.995f;
         }
     }
 
