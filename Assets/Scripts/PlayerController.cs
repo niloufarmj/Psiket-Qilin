@@ -133,6 +133,7 @@ public class PlayerController : MonoBehaviour
         // Set the laser speed now that the shooter has reached the target position
         lasers[laserIndex].SetActive(true);
         lasers[laserIndex].GetComponent<LaserController>().SetNewSprite(shooter);
+        lasers[laserIndex].GetComponent<LaserController>().EnableTrail(shooter);
         lasers[laserIndex].GetComponent<LaserController>().speed = 10;
     }
 

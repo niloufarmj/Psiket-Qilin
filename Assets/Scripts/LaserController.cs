@@ -6,6 +6,7 @@ public class LaserController : MonoBehaviour
 {
     public float speed;
     public Sprite[] balls;
+    public GameObject[] trails;
 
     private void Update()
     {
@@ -22,6 +23,15 @@ public class LaserController : MonoBehaviour
     public void SetNewSprite(int index)
     {
         GetComponent<SpriteRenderer>().sprite = balls[index];
+    }
+
+    public void EnableTrail(int index)
+    {
+        for (int i = 0; i < trails.Length; i++)
+        {
+            trails[i].SetActive(false);
+        }
+        trails[index].SetActive(true);
     }
 
 }
