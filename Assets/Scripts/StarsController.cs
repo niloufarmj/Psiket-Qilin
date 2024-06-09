@@ -16,7 +16,7 @@ public class StarsController : MonoBehaviour
 
     void Start()
     {
-        int starsCount = Random.Range(10, 20);
+        int starsCount = Random.Range(15, 40);
 
         for (int i = 0; i < starsCount; i++)
         {
@@ -43,6 +43,7 @@ public class StarsController : MonoBehaviour
     {
         GameObject newStar = Instantiate(starPrefab);
         newStar.transform.position = new Vector2(x, y);
-        newStar.GetComponent<SpriteRenderer>().sprite = starImages[Random.Range(0, starImages.Length)];
+        newStar.GetComponent<Image>().sprite = starImages[Random.Range(0, starImages.Length)];
+        newStar.transform.SetParent(GameObject.FindGameObjectWithTag("Stars").transform, false);
     }
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class PlayerController : MonoBehaviour
     public GameObjectStruct[] cxGates;
     public GameObjectStruct[] xcGates;
 
-    public float shooterMoveSpeed = 7.5f;
+    public float shooterMoveSpeed = 14.5f;
 
     public GameObject[] lasers;
 
@@ -260,9 +261,9 @@ public class PlayerController : MonoBehaviour
     {
         for (int i = 0; i < lasers.Length; i++)
         {
-            lasers[i].transform.position = new Vector2(lasers[i].transform.position.x, -1.2f);
-            lasers[i].GetComponent<LaserController>().speed = 0;
             lasers[i].SetActive(false);
+            lasers[i].transform.position = new Vector2(lasers[i].transform.position.x, GameManager.instance.yLocation);
+            lasers[i].GetComponent<LaserController>().speed = 0;
         }
     }
     
@@ -297,62 +298,103 @@ public class PlayerController : MonoBehaviour
             for (int i = 0; i < totalStates.Count; i++)
                 totalStates[i] = -1;
 
-            if (statePool.Count <= 2)
+            if (bitsCount == 3)
             {
-                for (int i = 0; i < statePool.Count; i++)
+                if (statePool.Count <= 2)
                 {
-                    totalStates.Add(CalculateIndex(statePool[i]));
-                }
-            }
-            else
-            {
-                int randCount = Random.Range(1, 4);
-                for (int i = 0; i < randCount; i++)
-                {
-                    totalStates.Add(CalculateIndex(statePool[Random.Range(0, statePool.Count)]));
-                }
-            }
-
-            totalStates = totalStates.OrderBy(num => num).ToList();
-
-            if (totalStates.Count == 1)
-            {
-                if (totalStates[0] < 3)
-                {
-                    EnableLaser(totalStates[0], 0);
-                }
-                else if (totalStates[0] < 6)
-                {
-                    EnableLaser(totalStates[0], 1);
+                    for (int i = 0; i < statePool.Count; i++)
+                    {
+                        totalStates.Add(CalculateIndex(statePool[i]));
+                    }
                 }
                 else
                 {
-                    EnableLaser(totalStates[0], 2);
+                    int randCount = Random.Range(1, 4);
+                    for (int i = 0; i < randCount; i++)
+                    {
+                        totalStates.Add(CalculateIndex(statePool[Random.Range(0, statePool.Count)]));
+                    }
+                }
+
+                totalStates = totalStates.OrderBy(num => num).ToList();
+
+                if (totalStates.Count == 1)
+                {
+                    if (totalStates[0] < 3)
+                    {
+                        EnableLaser(totalStates[0], 0);
+                    }
+                    else if (totalStates[0] < 6)
+                    {
+                        EnableLaser(totalStates[0], 1);
+                    }
+                    else
+                    {
+                        EnableLaser(totalStates[0], 2);
+                    }
+                }
+                else if (totalStates.Count == 2)
+                {
+                    if (totalStates[0] > 2)
+                    {
+                        EnableLaser(totalStates[0], 1);
+                        EnableLaser(totalStates[1], 2);
+                    }
+                    else if (totalStates[1] < 6)
+                    {
+                        EnableLaser(totalStates[0], 0);
+                        EnableLaser(totalStates[1], 1);
+                    }
+                    else
+                    {
+                        EnableLaser(totalStates[0], 0);
+                        EnableLaser(totalStates[1], 2);
+                    }
+                }
+                else
+                {
+                    EnableLaser(totalStates[0], 0);
+                    EnableLaser(totalStates[1], 1);
+                    EnableLaser(totalStates[2], 2);
                 }
             }
-            else if (totalStates.Count == 2)
+
+            else if (bitsCount == 2)
             {
-                if (totalStates[0] > 2)
+                if (statePool.Count < 2)
                 {
-                    EnableLaser(totalStates[0], 1);
-                    EnableLaser(totalStates[1], 2);
+                    for (int i = 0; i < statePool.Count; i++)
+                    {
+                        totalStates.Add(CalculateIndex(statePool[i]));
+                    }
                 }
-                else if (totalStates[1] < 6)
+                else
+                {
+                    int randCount = Random.Range(1, 3);
+                    for (int i = 0; i < randCount; i++)
+                    {
+                        totalStates.Add(CalculateIndex(statePool[Random.Range(0, statePool.Count)]));
+                    }
+                }
+
+                totalStates = totalStates.OrderBy(num => num).ToList();
+
+                if (totalStates.Count == 1)
+                {
+                    if (totalStates[0] < 2)
+                    {
+                        EnableLaser(totalStates[0], 0);
+                    }
+                    else 
+                    {
+                        EnableLaser(totalStates[0], 1);
+                    }
+                }
+                else
                 {
                     EnableLaser(totalStates[0], 0);
                     EnableLaser(totalStates[1], 1);
                 }
-                else
-                {
-                    EnableLaser(totalStates[0], 0);
-                    EnableLaser(totalStates[1], 2);
-                }
-            }
-            else
-            {
-                EnableLaser(totalStates[0], 0);
-                EnableLaser(totalStates[1], 1);
-                EnableLaser(totalStates[2], 2);
             }
         }
 
@@ -405,6 +447,11 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Return))
         {
             Fire();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene(0);
         }
 
         EnableSelection();

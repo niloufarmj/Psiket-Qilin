@@ -1,39 +1,47 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour
 {
-    public float speed;
     public GameObject leftChild, center, rightChild;
-    public float[] xLocations;
+
+    private float[] xLocations;
 
     public Sprite[] childs, centers;
 
-    public float childLength, centerScaleFactor;
+    private float centerScaleFactor;
 
     public int leftIndex, rightIndex;
 
-    private GameObject[] lasers;
 
     bool leftCollided = false;
     bool rightCollided = false;
 
+    
+
     private void Start()
     {
+        xLocations = GameManager.instance.xLocations;
+        centerScaleFactor = GameManager.instance.centerScaleFactor;
         initEnemy();
     }
 
     void Update()
     {
-        transform.position = new Vector2(transform.position.x, transform.position.y - speed * Time.deltaTime);
+        transform.position = new Vector2(transform.position.x, transform.position.y - GameManager.instance.enemySpeed * Time.deltaTime);
 
         // Check for collision with "Laser" tag
         CheckLaserCollision();
 
-        if (transform.position.y < -1.1f)
+        if (transform.position.y < GameManager.instance.yLocation + 0.6f)
+        {
+            GameManager.instance.AddMissed();
             Destroy(gameObject);
+        }
+
     }
 
     private void initEnemy()
@@ -42,19 +50,17 @@ public class EnemyController : MonoBehaviour
         rightIndex = Random.Range(leftIndex, xLocations.Length);
         int spriteIndex = Random.Range(0, childs.Length);
 
-        if (leftIndex == 0 && rightIndex == 7) rightIndex = 6;
-
 
         transform.position = new Vector2(xLocations[Random.Range(0, xLocations.Length)], 6);
 
-        leftChild.transform.position = new Vector2(xLocations[leftIndex] - childLength / 2, 6);
-        rightChild.transform.position = new Vector2(xLocations[rightIndex] + childLength / 2, 6);
-        leftChild.GetComponent<SpriteRenderer>().sprite = childs[spriteIndex];
-        rightChild.GetComponent<SpriteRenderer>().sprite = childs[spriteIndex];
+        leftChild.transform.position = new Vector2(xLocations[leftIndex], 6);
+        rightChild.transform.position = new Vector2(xLocations[rightIndex], 6);
+        leftChild.GetComponent<Image>().sprite = childs[spriteIndex];
+        rightChild.GetComponent<Image>().sprite = childs[spriteIndex];
 
         center.transform.localScale = new Vector2((rightIndex - leftIndex) * centerScaleFactor, center.transform.localScale.y);
-        center.transform.position = new Vector2(leftChild.transform.position.x + childLength / 2 + (rightIndex - leftIndex) * 0.46f, 5.93f);
-        center.GetComponent<SpriteRenderer>().sprite = centers[spriteIndex];
+        center.transform.position = new Vector2(leftChild.transform.position.x + (rightIndex - leftIndex) * GameManager.instance.centerLength, 5.93f);
+        center.GetComponent<Image>().sprite = centers[spriteIndex];
 
         if (leftIndex == rightIndex)
         {
@@ -77,6 +83,7 @@ public class EnemyController : MonoBehaviour
                 lasers[i].SetActive(false);
             }
 
+            GameManager.instance.AddKilled();
             Destroy(gameObject);
         }
     }

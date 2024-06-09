@@ -29,5 +29,6 @@ public class EnemiesController : MonoBehaviour
     public void SpawnEnemy()
     {
         GameObject enemyObj = Instantiate(enemyPrefab);
+        enemyObj.transform.SetParent(GameObject.FindGameObjectWithTag("Enemies").transform, false);
     }
 }

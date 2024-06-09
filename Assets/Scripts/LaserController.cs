@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LaserController : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class LaserController : MonoBehaviour
     {
         transform.position = new Vector2(transform.position.x, transform.position.y + speed * Time.deltaTime);
 
-        if (transform.position.y > 5.2f)
+        if (transform.position.y > GameManager.instance.yLocation + 7)
         {
             transform.position = new Vector2(transform.position.x, -0.2f);
             speed = 0;
@@ -22,7 +23,7 @@ public class LaserController : MonoBehaviour
 
     public void SetNewSprite(int index)
     {
-        GetComponent<SpriteRenderer>().sprite = balls[index];
+        GetComponent<Image>().sprite = balls[index];
     }
 
     public void EnableTrail(int index)
