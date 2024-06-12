@@ -124,7 +124,7 @@ public class PlayerController : MonoBehaviour
         {
             // Use Lerp to smoothly move the shooter towards the target position
             shooters[shooter].transform.position = Vector2.Lerp(startPosition, targetPosition, elapsedTime / (journeyLength / shooterMoveSpeed));
-            elapsedTime += Time.deltaTime;
+            elapsedTime += Time.deltaTime * 3;
             yield return null;
         }
 
@@ -262,7 +262,7 @@ public class PlayerController : MonoBehaviour
         for (int i = 0; i < lasers.Length; i++)
         {
             lasers[i].SetActive(false);
-            lasers[i].transform.position = new Vector2(lasers[i].transform.position.x, GameManager.instance.yLocation);
+            lasers[i].transform.position = new Vector2(lasers[i].transform.position.x, GameManager.instance.yLocation + 0.5f);
             lasers[i].GetComponent<LaserController>().speed = 0;
         }
     }
@@ -361,7 +361,7 @@ public class PlayerController : MonoBehaviour
 
             else if (bitsCount == 2)
             {
-                if (statePool.Count < 2)
+                if (statePool.Count <= 2)
                 {
                     for (int i = 0; i < statePool.Count; i++)
                     {
@@ -396,6 +396,8 @@ public class PlayerController : MonoBehaviour
                     EnableLaser(totalStates[1], 1);
                 }
             }
+
+            GameManager.instance.laserSound.Play();
         }
 
         ResetGates();
@@ -451,10 +453,15 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            SceneManager.LoadScene(0);
+            HandleReturn();
         }
 
         EnableSelection();
+    }
+
+    public void HandleReturn()
+    {
+        SceneManager.LoadScene(0);
     }
 
 

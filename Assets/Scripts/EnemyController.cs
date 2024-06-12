@@ -16,6 +16,8 @@ public class EnemyController : MonoBehaviour
 
     public int leftIndex, rightIndex;
 
+    public GameObject deathParticle;
+
 
     bool leftCollided = false;
     bool rightCollided = false;
@@ -46,6 +48,7 @@ public class EnemyController : MonoBehaviour
 
     private void initEnemy()
     {
+        GameManager.instance.InitLocations();
         leftIndex = Random.Range(0, xLocations.Length);
         rightIndex = Random.Range(leftIndex, xLocations.Length);
         int spriteIndex = Random.Range(0, childs.Length);
@@ -58,9 +61,15 @@ public class EnemyController : MonoBehaviour
         leftChild.GetComponent<Image>().sprite = childs[spriteIndex];
         rightChild.GetComponent<Image>().sprite = childs[spriteIndex];
 
-        center.transform.localScale = new Vector2((rightIndex - leftIndex) * centerScaleFactor, center.transform.localScale.y);
-        center.transform.position = new Vector2(leftChild.transform.position.x + (rightIndex - leftIndex) * GameManager.instance.centerLength, 5.93f);
+
+        center.transform.position = new Vector2(leftChild.transform.position.x, 5.93f);
         center.GetComponent<Image>().sprite = centers[spriteIndex];
+
+        RectTransform centerRect = center.GetComponent<RectTransform>();
+
+        centerRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 
+            rightChild.GetComponent<RectTransform>().anchoredPosition.x - leftChild.GetComponent<RectTransform>().anchoredPosition.x);
+        
 
         if (leftIndex == rightIndex)
         {
@@ -68,20 +77,30 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    private IEnumerator WaitForSeconds(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+    }
+
     private void CheckLaserCollision()
     {
         leftCollided = leftChild.GetComponent<EnemyCollisionHandler>().isCollided();
         rightCollided = rightChild.GetComponent<EnemyCollisionHandler>().isCollided();
 
-        GameObject[] lasers = { leftChild.GetComponent<EnemyCollisionHandler>().getCollidedLaser(), rightChild.GetComponent<EnemyCollisionHandler>().getCollidedLaser() };
+        
         if (leftCollided && rightCollided)
         {
+            GameManager.instance.deathSound.Play();
+            GameObject[] lasers = { leftChild.GetComponent<EnemyCollisionHandler>().getCollidedLaser(), rightChild.GetComponent<EnemyCollisionHandler>().getCollidedLaser() };
             for (int i = 0; i < lasers.Length; i++)
             {
                 lasers[i].transform.position = new Vector2(lasers[i].transform.position.x, -0.6f);
                 lasers[i].GetComponent<LaserController>().speed = 0;
                 lasers[i].SetActive(false);
             }
+
+            Instantiate(deathParticle, leftChild.gameObject.transform.position, leftChild.gameObject.transform.rotation);
+            Instantiate(deathParticle, rightChild.gameObject.transform.position, rightChild.gameObject.transform.rotation);
 
             GameManager.instance.AddKilled();
             Destroy(gameObject);

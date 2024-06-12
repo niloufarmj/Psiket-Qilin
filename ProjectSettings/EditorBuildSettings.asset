@@ -8,10 +8,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Menu.unity
     guid: 1a497b7788236a7498eeb8d93ab5bff1
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Game 2Bits.unity
-    guid: 5f72bec11e991a64db7bb69076b18d19
+    guid: 48fc805d0ffbed045bd73ede06e55dcd
   - enabled: 1
     path: Assets/Scenes/Game 3Bits.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/Guide 2Bits.unity
+    guid: 7e01278aa34691e45a1905f4698c8592
+  - enabled: 1
+    path: Assets/Scenes/Guide 3Bits.unity
+    guid: 3c853b3898ae75b4b958ac9ea822dac7
   m_configObjects: {}

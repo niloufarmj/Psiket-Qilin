@@ -20,14 +20,22 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            SceneManager.LoadScene(1);
-            SceneManager.LoadScene(1);
+            SceneManager.LoadScene(2);
         }
     }
 
     public void Controls()
     {
-
+        if (qbitMenu.activeSelf) DisableQbitMenu();
+        if (speedMenu.activeSelf) DisableSpeedMenu();
+        if (data.Qbits == 2)
+        {
+            SceneManager.LoadScene(3);
+        }
+        else
+        {
+            SceneManager.LoadScene(4);
+        }
     }
 
     public void HandleQbitMenu()

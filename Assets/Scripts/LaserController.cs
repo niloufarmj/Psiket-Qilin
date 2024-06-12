@@ -9,6 +9,8 @@ public class LaserController : MonoBehaviour
     public Sprite[] balls;
     public GameObject[] trails;
 
+    public Image image;
+
     private void Update()
     {
         transform.position = new Vector2(transform.position.x, transform.position.y + speed * Time.deltaTime);
@@ -23,7 +25,7 @@ public class LaserController : MonoBehaviour
 
     public void SetNewSprite(int index)
     {
-        GetComponent<Image>().sprite = balls[index];
+        image.sprite = balls[index];
     }
 
     public void EnableTrail(int index)
