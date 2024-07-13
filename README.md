@@ -5,6 +5,12 @@ arcade gameplay with the principles of quantum mechanics. Developed for
 the PsiKet Academy, the game challenges players to strategically
 manipulate quantum bits (qubits) to defeat their enemies.
 
+
+
+https://github.com/user-attachments/assets/f3b70d69-ec55-4271-9b75-31b81f126571
+
+
+
 ## Key Features
 
 ### 1. Quantum Mechanics Integration:
